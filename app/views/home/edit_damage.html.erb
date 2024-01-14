@@ -1,0 +1,125 @@
+<h2 class="text-center mb-4">Editar daño</h2>
+
+<div class="text-center border p-2 rounded-3 mb-3">
+  <canvas id="canvas" width="500"></canvas>
+  <div class="text-center">
+    <button class="btn btn-sm btn-outline-secondary disabled" id="move" title="Mover">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrows-move" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M18 9l3 3l-3 3"/>
+        <path d="M15 12h6"/>
+        <path d="M6 9l-3 3l3 3"/>
+        <path d="M3 12h6"/>
+        <path d="M9 18l3 3l3 -3"/>
+        <path d="M12 15v6"/>
+        <path d="M15 6l-3 -3l-3 3"/>
+        <path d="M12 3v6"/>
+      </svg>
+    </button>
+
+    <button class="btn btn-sm btn-outline-secondary" id="pencil" title="Pintar">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/>
+        <path d="M13.5 6.5l4 4"/>
+      </svg>
+    </button>
+
+    <button class="btn btn-sm btn-outline-secondary" id="eraser" title="Borrar">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eraser" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3"/>
+        <path d="M18 13.3l-6.3 -6.3"/>
+      </svg>
+    </button>
+
+    <button class="btn btn-sm btn-outline-secondary" id="clear" title="Limpiar">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-wash-dryclean" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div class="text-center border p-2 rounded-3 mb-3">
+  <canvas id="canvas1" width="500"></canvas>
+</div>
+
+<div class="d-flex justify-content-between">
+  <%#= link_to "Guardar", "", class: 'btn btn-outline-primary' %>
+  <button class="btn btn-outline-primary" id="save">Guardar</button>
+  <%= link_to "Cancelar", root_path, class: 'btn btn-outline-primary' %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(() => {
+        let canvas = new fabric.Canvas('canvas');
+        let canvas1 = new fabric.Canvas('canvas1');
+        let move = $('#move');
+        let pencil = $('#pencil');
+        let eraser = $('#eraser');
+        let clear = $('#clear');
+        let save = $('#save');
+
+        canvas.freeDrawingBrush.width = 10;
+
+        loadImage();
+
+        function loadImage() {
+            fabric.Image.fromURL("<%= image_path 'car.svg' %>", (img) => {
+                img.set('selectable', false);
+                img.scaleToWidth(500);
+                canvas.add(img);
+                canvas.setHeight(img.height * img.scaleY);
+            });
+        }
+
+        function exportCanvas() {
+            let json = canvas.toJSON();
+            canvas1.loadFromJSON(json, () => {
+                canvas1.setHeight(canvas1.getObjects()[0].height * canvas1.getObjects()[0].scaleY);
+                canvas1.getObjects()[0].set('selectable', false);
+            });
+        }
+
+        save.click(() => {
+            exportCanvas();
+        })
+
+        move.click(function () {
+            $(this).addClass('disabled');
+            pencil.removeClass('disabled');
+            eraser.removeClass('disabled');
+            canvas.isDrawingMode = false;
+        });
+
+        pencil.click(function () {
+            $(this).addClass('disabled');
+            move.removeClass('disabled');
+            eraser.removeClass('disabled');
+            canvas.isDrawingMode = true;
+            canvas.freeDrawingBrush.color = 'rgba(255,0,0,.5)';
+        });
+
+        eraser.click(function () {
+            $(this).addClass('disabled');
+            move.removeClass('disabled');
+            pencil.removeClass('disabled');
+            canvas.isDrawingMode = false;
+        });
+
+        clear.click(function () {
+            pencil.removeClass('disabled');
+            eraser.removeClass('disabled');
+            canvas.clear();
+            loadImage();
+        });
+
+        canvas.on('mouse:down', (e) => {
+            let target = e.target;
+            if (target && !target.isType('image') && eraser.hasClass('disabled'))
+                canvas.remove(target);
+        })
+    })
+</script>

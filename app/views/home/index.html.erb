@@ -1,0 +1,21 @@
+<h2 class="text-center mb-4">Vehicle Damage App</h2>
+
+<div class="text-center border p-2 rounded-3 mb-3">
+  <canvas id="canvas" width="500"></canvas>
+</div>
+
+<div class="text-end">
+  <%= link_to "Editar", edit_damage_path, class: 'btn btn-outline-primary' %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(() => {
+        let canvas = new fabric.Canvas('canvas');
+        fabric.Image.fromURL("<%= image_path 'car.svg' %>", (img) => {
+            img.set('selectable', false);
+            img.scaleToWidth(500);
+            canvas.add(img);
+            canvas.setHeight(img.height * img.scaleY);
+        });
+    })
+</script>
