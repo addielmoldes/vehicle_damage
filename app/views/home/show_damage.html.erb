@@ -1,0 +1,30 @@
+<h4 class="mb-4">Mostrar daño vehículo #<%= @vehicle.id %></h4>
+
+<div class="text-center border p-2 rounded-3 mb-3">
+  <canvas id="canvas" width="500"></canvas>
+</div>
+
+<div class="d-flex justify-content-between">
+  <%= link_to "Cancelar", root_path, class: 'btn btn-outline-primary' %>
+  <%= link_to "Editar", edit_damage_path(@vehicle), class: 'btn btn-outline-primary' %>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $(() => {
+        let canvas = new fabric.Canvas('canvas');
+
+        loadCarDamage();
+
+        function loadCarDamage() {
+            let data = document.createElement('div');
+            data.innerHTML = "<%= @damage.data %>"
+            let json = JSON.parse(data.innerHTML);
+            canvas.loadFromJSON(json, () => {
+                canvas.setHeight(canvas.getObjects()[0].height * canvas.getObjects()[0].scaleY);
+                canvas.getObjects().forEach(item => {
+                    item.selectable = false;
+                })
+            });
+        }
+    })
+</script>
